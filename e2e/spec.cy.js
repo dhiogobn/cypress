@@ -96,7 +96,44 @@ describe('template spec', () => {
       const competences = text[0].innerText.trim();
       console.log("competencias", competences)
     })
+
+    cy.get('#ember149 > :nth-child(3) > :nth-child(1)').then((text) => {
+      const volunteerWork = text[0].innerText.trim();
+      console.log("Trabalhos voluntários: ", volunteerWork)
     })
+
+    cy.get('#ember152 > :nth-child(3) > :nth-child(1)').then((text) => {
+      const certificates = text[0].innerText.trim()
+      console.log("Certificados: ", certificates)
+    })
+
+    cy.get('#ember156 > :nth-child(3) > :nth-child(1)').then((text) => {
+      const projects = text[0].innerText.trim()
+      console.log("Projetos: ", projects)
+    })
+
+    cy.get('#ember162 > :nth-child(3) > :nth-child(1)').then((text) => {
+      const publications = text[0].innerText.trim()
+      console.log("Publicações: ", publications)
+    })
+
+    cy.get('#ember163 > .pvs-list__outer-container > .pvs-list > :nth-child(1) > .pvs-entity').then((text) => {
+      const courses = text[0].innerText.trim()
+      console.log("Cursos: ", courses)
+    })
+
+    cy.get('#ember163 > :nth-child(3) > :nth-child(1)').then((text) => {
+      const recognizesAndPrizes = text[0].innerText.trim()
+      console.log("Reconhecimentos e premios: ", recognizesAndPrizes)
+    })
+
+    cy.get('#ember167 > :nth-child(3) > :nth-child(1)').then((text) => {
+      const organizations = text[0].innerText.trim()
+      console.log("Organizações: ", organizations)
+    })
+
+    
+  })
     // console.log("sites: ")
     // cy.get(':nth-child(1) > .pv-contact-info__contact-link').invoke('text').then((text) => {
     //   const linkedinProfile = text.trim();
