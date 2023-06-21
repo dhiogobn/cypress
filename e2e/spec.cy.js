@@ -40,18 +40,34 @@ describe('template spec', () => {
       const conections = text.trim();
       console.log("conexões: ", conections) 
     })
-    cy.get('#top-card-text-details-contact-info').click()
-    console.log("informações de contato")
 
-    cy.get('.ci-vanity-url > .pv-contact-info__ci-container > .pv-contact-info__contact-link').invoke('text').then((text) => {
-      const linkedinProfile = text.trim();
-      console.log("perfil: ", linkedinProfile) 
+    cy.get('[data-generated-suggestion-target="urn:li:fsu_profileActionDelegate:-1839640498"] > .pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]')
+    .invoke('text').then((text) => {
+      const about = text.trim();
+      console.log("Sobre: ", about) 
     })
-    const cont = 0;
-    cy.get('.pv-contact-info__ci-container').each((sites) => {
-      console.log("sites: ", sites[0].children[0].innerText)
-    });
 
+    cy.wait(2000)
+    cy.get('#navigation-index-see-all-languages').click()
+    cy.wait(2000)
+    cy.get('.pvs-list__paged-list-item').each((lenguages) => {
+      console.log(lenguages[0].children[0].innerText)
+    })
+
+    // cy.get('#top-card-text-details-contact-info').click()
+    // console.log("informações de contato")
+
+    // cy.get('.ci-vanity-url > .pv-contact-info__ci-container > .pv-contact-info__contact-link').invoke('text').then((text) => {
+    //   const linkedinProfile = text.trim();
+    //   console.log("perfil: ", linkedinProfile) 
+    // })
+    // const cont = 0;
+    // const array = []
+    // cy.get('.pv-contact-info__ci-container').each((sites) => {
+    //   if(sites[0].children[0].innerText) {
+    //     array.push(sites[0].children[0].innerText)
+    //   }
+    // });
     })
     // console.log("sites: ")
     // cy.get(':nth-child(1) > .pv-contact-info__contact-link').invoke('text').then((text) => {
