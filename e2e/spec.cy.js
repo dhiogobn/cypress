@@ -10,7 +10,7 @@ describe('template spec', () => {
     cy.get('#session_key').type('lticontasc@gmail.com')
     cy.get('#session_password').type('Linkedinlti!')
     cy.get('.justify-between > .btn-md').click()
-    cy.wait(50000)
+    cy.wait(10000)
     cy.visit('https://www.linkedin.com/in/micheleprofmatematica/')  
     cy.wait(2000)
     cy.get('.text-heading-xlarge').invoke('text').then((text) => {
@@ -48,18 +48,11 @@ describe('template spec', () => {
       console.log("perfil: ", linkedinProfile) 
     })
     const cont = 0;
-    cy.get('.ci-websites > .list-style-none').each((sites) => {
-      // Para cada tag de experiência encontrada
-      cy.wrap(sites)
-        .find(`:nth-child(${cont})`) // Substitua '.titulo-class' pelo seletor correto da tag que contém o título da experiência
-        .invoke('text')
-        .then((titulo) => {
-          console.log("titulo", titulo)
-          cont = cont + 1
-        });
-    })
-    cont = 0
+    cy.get('.pv-contact-info__ci-container').each((sites) => {
+      console.log("sites: ", sites[0].children[0].innerText)
+    });
 
+    })
     // console.log("sites: ")
     // cy.get(':nth-child(1) > .pv-contact-info__contact-link').invoke('text').then((text) => {
     //   const linkedinProfile = text.trim();
@@ -75,7 +68,7 @@ describe('template spec', () => {
     //   const linkedinProfile = text.trim();
     //   console.log("perfil: ", linkedinProfile) 
     // })
-  })
+  
 })
 
 
