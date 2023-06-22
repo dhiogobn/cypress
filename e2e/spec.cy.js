@@ -92,10 +92,12 @@ describe('template spec', () => {
       console.log("formações academicas", academicsFormations)
     })
 
-    cy.get('#ember114 > :nth-child(3) > :nth-child(1)').then((text) => {
-      const experiences = text[0].innerText.trim()
-      console.log("Experiencias: ", experiences)
-    })
+    if(cy.get('#ember114 > :nth-child(3) > :nth-child(1)')){
+      cy.get('#ember114 > :nth-child(3) > :nth-child(1)').then((text) => {
+        const experiences = text[0].innerText.trim()
+        console.log("Experiencias: ", experiences)
+      })
+    }
 
     cy.get('#ember233 > :nth-child(3) > :nth-child(1)').then((text) =>{
       const competences = text[0].innerText.trim();
