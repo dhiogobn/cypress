@@ -1,18 +1,23 @@
 const { timeout } = require("async")
+const { before } = require("mocha")
 const { elementAt } = require("rxjs")
+const profileUrl = 'https://www.linkedin.com/in/micheleprofmatematica/'
+const loginPage = 'https://www.linkedin.com/authwall?trk=qf&original_referer=https://www.linkedin.com/in/micheleprofmatematica/?originalSubdomain=br&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2F'
 
 describe('template spec', () => {
+  before(() => {
+    cy.visit(loginPage, {
+      failOnStatusCode: false
+      })
+      cy.get('.authwall-join-form__form-toggle--bottom').click()
+      cy.wait(2000)
+      cy.get('#session_key').type('lticontasc@gmail.com')
+      cy.get('#session_password').type('Linkedinlti!')
+      cy.get('.justify-between > .btn-md').click()
+      cy.wait(20000)
+      cy.visit(profileUrl)  
+  })
   it('passes', () => {
-    cy.visit('https://www.linkedin.com/authwall?trk=qf&original_referer=https://www.linkedin.com/in/micheleprofmatematica/?originalSubdomain=br&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2F', {
-    failOnStatusCode: false
-    })
-    cy.get('.authwall-join-form__form-toggle--bottom').click()
-    cy.wait(2000)
-    cy.get('#session_key').type('lticontasc@gmail.com')
-    cy.get('#session_password').type('Linkedinlti!')
-    cy.get('.justify-between > .btn-md').click()
-    cy.wait(20000)
-    cy.visit('https://www.linkedin.com/in/micheleprofmatematica/')  
     cy.wait(2000)
     cy.get('.text-heading-xlarge').invoke('text').then((text) => {
       const title = text.trim();
@@ -56,7 +61,7 @@ describe('template spec', () => {
     })
 
     cy.wait(2000)
-    cy.visit('https://www.linkedin.com/in/micheleprofmatematica/')  
+    cy.visit(profileUrl)  
 
     cy.wait(2000)
 
@@ -79,7 +84,7 @@ describe('template spec', () => {
       })
     });
 
-    cy.visit('https://www.linkedin.com/in/micheleprofmatematica/')  
+    cy.visit(profileUrl)  
     cy.wait(2000)
 
     cy.get('#ember134 > :nth-child(3) > :nth-child(1)').then((text) => {
@@ -87,10 +92,12 @@ describe('template spec', () => {
       console.log("formações academicas", academicsFormations)
     })
 
-    cy.get('#ember114 > :nth-child(3) > :nth-child(1)').then((text) => {
-      const experiences = text[0].innerText.trim()
-      console.log("Experiencias: ", experiences)
-    })
+    if(cy.get('#ember114 > :nth-child(3) > :nth-child(1)')){
+      cy.get('#ember114 > :nth-child(3) > :nth-child(1)').then((text) => {
+        const experiences = text[0].innerText.trim()
+        console.log("Experiencias: ", experiences)
+      })
+    }
 
     cy.get('#ember233 > :nth-child(3) > :nth-child(1)').then((text) =>{
       const competences = text[0].innerText.trim();
