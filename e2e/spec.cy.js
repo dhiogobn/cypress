@@ -5,8 +5,8 @@ const { elementAt } = require("rxjs")
 const profiles = ['https://www.linkedin.com/in/micheleprofmatematica/', 'https://www.linkedin.com/in/dhiogo-bandeira-nobrega-660951192/', 'https://www.linkedin.com/in/conrado-sanchez-alonso']
 // https://www.linkedin.com/in/micheleprofmatematica/
 // https://www.linkedin.com/in/dhiogo-bandeira-nobrega-660951192/
-var profileUrl = profiles[1]
-var loginPage = 'https://www.linkedin.com/authwall?trk=qf&original_referer=https://www.linkedin.com/in/micheleprofmatematica/?originalSubdomain=br&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2F'
+const profileUrl = profiles[1]
+const loginPage = 'https://www.linkedin.com/authwall?trk=qf&original_referer=https://www.linkedin.com/in/micheleprofmatematica/?originalSubdomain=br&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2F'
 var title = ''
 var subscription = ''
 var talkAbout = ''
@@ -26,7 +26,6 @@ var publications = []
 var courses = []
 var honorsAndAwards = []
 var organizations = []
-
 
 describe('template spec', () => {
   before(() => {
@@ -73,11 +72,13 @@ describe('template spec', () => {
       title = text.trim();
       console.log("titulo: ",title)
     })
+    cy.wait(2000)
     cy.get('.text-body-medium').invoke('text').then((text) => {
       subscription = text.trim();
       console.log("descrição: ", subscription)
     })
 
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').length > 0) {
         cy.get('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').invoke('text').then((text) => {
@@ -86,7 +87,7 @@ describe('template spec', () => {
         })
       }
     })
-
+    cy.wait(2000)
 
     cy.get('body').then((body) => {
       if (body.find('.pv-text-details__left-panel.mt2 > .text-body-small').length > 0) {
@@ -98,7 +99,7 @@ describe('template spec', () => {
     })
 
 
-
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('.pv-top-card--list').length > 0) {
         cy.get('.pv-top-card--list').invoke('text').then((text) => {
@@ -117,7 +118,7 @@ describe('template spec', () => {
     //   }
     // })
 
-
+    cy.wait(2000)
         // [data-generated-suggestion-target="urn:li:fsu_profileActionDelegate:-1839640498"] > .pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]
     cy.get('body').then((body) => {
       if (body.find('.pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]').length > 0) {
@@ -146,7 +147,7 @@ describe('template spec', () => {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 languages.push(value[0].innerText.trim())
-                console.log("languages: ", value[0].innerText.trim())
+                console.log("languages: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
           }
@@ -166,7 +167,6 @@ describe('template spec', () => {
         cy.wait(2000)
       }
     })
-
     console.log("informações de contato")
 
     // cy.get('.ci-vanity-url > .pv-contact-info__ci-container > .pv-contact-info__contact-link').invoke('text').then((text) => {
@@ -174,7 +174,7 @@ describe('template spec', () => {
     //   console.log("perfil: ", linkedinProfile) 
     // })
     // const cont = 0;
-
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('.ci-vanity-url > .pv-contact-info__ci-container').length > 0) {
         cy.get('.ci-vanity-url > .pv-contact-info__ci-container').then((text) =>{
@@ -184,7 +184,8 @@ describe('template spec', () => {
 
       }
     })
-
+    cy.wait(2000)
+    const array = []
     cy.get('body').then((body) => {
       if (body.find('.ci-websites > .list-style-none').length > 0) {
         cy.get('.ci-websites > .list-style-none').each((site) => {
@@ -199,7 +200,7 @@ describe('template spec', () => {
         });
       }
     })
-
+    cy.wait(2000)
     cy.visit(profileUrl)
     cy.wait(2000)
 
@@ -212,7 +213,7 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   education.push(value[0].innerText.trim())
-                  console.log("education: ", value[0].innerText.trim())
+                  console.log("education: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
@@ -220,54 +221,9 @@ describe('template spec', () => {
         }
       }
     })
-
-    // Aguarde até que a página de feed seja carregada
-    // cy.waitUntil(() => cy.url().should('include', '/feed'), { timeout: 10000 });
-
-    // Vá para o perfil do usuário
+    cy.wait(2000)
     cy.visit(profileUrl);
-
-    // Aguarde até que a página do perfil seja carregada
-    // cy.waitUntil(() => cy.url().should('include', '/in/'), { timeout: 10000 });
-
-    // Role até o final da página para carregar todas as experiências
-
     cy.wait(2000)
-
-    // cy.get('body').then((body) => {
-    //   if(body.find('#navigation-index-see-all-experiences > .pvs-navigation__text').length > 0) {
-    //     cy.get('#navigation-index-see-all-experiences > .pvs-navigation__text').click()
-    //   }
-    // })
-
-    cy.wait(2000)
-    // cy.get('body').then((body) => {
-    //   if (body.find('.artdeco-list__item').length > 0) {
-    //     if(cy.get('.artdeco-list__item')){
-    //       cy.get('.artdeco-list__item').then((text) => {
-    //         const experiences = text[0].innerText.trim()
-    //         console.log("Experiencias: ", experiences)
-    //       })
-    //     }
-    //   }
-    // })
-
-    // const experiences = [];
-    // cy.get('body').then((body) => {
-    //   if (body.find('li').length > 0) {
-    //     if(cy.get('li')){
-    //       cy.get('li').then((text) => {
-    //         text.each((value) => {
-    //           if(text[value].className.includes("pvs-list__paged-list-item artdeco-list__item pvs-list__item--line-separated pvs-list__item--one-column")){
-    //             experiences.push(text[value].innerText)
-    //           }
-    //           console.log("experiencias ", experiences)
-    //         })
-    //       })
-    //     }
-    //   }
-    // })
-
 
     cy.get('body').then((body) => {
       if (body.find('#experience').length > 0) {
@@ -278,7 +234,7 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   experience.push(value[0].innerText.trim())
-                  console.log("Experience: ", value[0].innerText.trim())
+                  console.log("Experience: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
@@ -286,33 +242,26 @@ describe('template spec', () => {
         }
       }
     })
-
+    cy.wait(2000)
 
     cy.get('body').then((body) => {
       if (body.find('#skills').length > 0) {
         if(cy.get('#skills')){
           cy.get('#skills').then((text) => {
             const id = text[0].offsetParent.id;
-            console.log('id: ', id)
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   skills.push(value[0].innerText.trim())
-                  console.log("skills: ", value[0].innerText.trim())
+                  console.log("skills: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
           })
         }
       }
-      // if (body.find('#ember233 > :nth-child(3) > :nth-child(1)').length > 0) {
-      //   cy.get('#ember233 > :nth-child(3) > :nth-child(1)').then((text) =>{
-      //     const competences = text[0].innerText.trim();
-      //     console.log("competencias", competences)
-      //   })
-      // }
     })
-
+    cy.wait(2000)
 
     cy.get('body').then((body) => {
       if (body.find('#volunteering_experience').length > 0) {
@@ -323,7 +272,7 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   volunteering.push(value[0].innerText.trim())
-                  console.log("Volunteering experience: ", value[0].innerText.trim())
+                  console.log("Volunteering experience: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
@@ -333,7 +282,7 @@ describe('template spec', () => {
       }
     })
 
-
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('#licenses_and_certifications').length > 0) {
         if(cy.get('#licenses_and_certifications')){
@@ -343,22 +292,16 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   licencesAndCertifications.push(value[0].innerText.trim())
-                  console.log("licenses and certifications: ", value[0].innerText.trim())
+                  console.log("licenses and certifications: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
           })
         }
       }
-      // if (body.find('#ember152 > :nth-child(3) > :nth-child(1)').length > 0) {
-      //   cy.get('#ember152 > :nth-child(3) > :nth-child(1)').then((text) => {
-      //     const certificates = text[0].innerText.trim()
-      //     console.log("Certificados: ", certificates)
-      //   })
-      // }
     })
 
-
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('#projects').length > 0) {
         if(cy.get('#projects')){
@@ -368,7 +311,7 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   projects.push(value[0].innerText.trim())
-                  console.log("projects: ", value[0].innerText.trim())
+                  console.log("projects: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
@@ -377,7 +320,7 @@ describe('template spec', () => {
       }
     })
 
-
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('#publications').length > 0) {
         if(cy.get('#publications')){
@@ -387,22 +330,16 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   publications.push(value[0].innerText.trim())
-                  console.log("publications: ", value[0].innerText.trim())
+                  console.log("publications: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
           })
         }
       }
-      // if (body.find('#ember162 > :nth-child(3) > :nth-child(1)').length > 0) {
-      //   cy.get('#ember162 > :nth-child(3) > :nth-child(1)').then((text) => {
-      //     const publications = text[0].innerText.trim()
-      //     console.log("Publicações: ", publications)
-      //   })
-      // }
     })
 
-
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('#courses').length > 0) {
         if(cy.get('#courses')){
@@ -412,21 +349,15 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   courses.push(value[0].innerText.trim())
-                  console.log("courses: ", value[0].innerText.trim())
+                  console.log("courses: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
           })
         }
       }
-      // if (body.find('#ember163 > .pvs-list__outer-container > .pvs-list > :nth-child(1) > .pvs-entity').length > 0) {
-      //   cy.get('#ember163 > .pvs-list__outer-container > .pvs-list > :nth-child(1) > .pvs-entity').then((text) => {
-      //     const courses = text[0].innerText.trim()
-      //     console.log("Cursos: ", courses)
-      //   })
-      // }
     })
-
+    cy.wait(2000)
 
     cy.get('body').then((body) => {
       if (body.find('#honors_and_awards').length > 0) {
@@ -437,22 +368,16 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   honorsAndAwards.push(value[0].innerText.trim())
-                  console.log("honors and awards: ", value[0].innerText.trim())
+                  console.log("honors and awards: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
           })
         }
       }
-      // if (body.find('#ember163 > :nth-child(3) > :nth-child(1)').length > 0) {
-      //   cy.get('#ember163 > :nth-child(3) > :nth-child(1)').then((text) => {
-      //     const recognizesAndPrizes = text[0].innerText.trim()
-      //     console.log("Reconhecimentos e premios: ", recognizesAndPrizes)
-      //   })
-      // }
     })
 
-
+    cy.wait(2000)
     cy.get('body').then((body) => {
       if (body.find('#organizations').length > 0) {
         if(cy.get('#organizations')){
@@ -462,86 +387,22 @@ describe('template spec', () => {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                   organizations.push(value[0].innerText.trim())
-                  console.log("organizations: ", value[0].innerText.trim())
+                  console.log("organizations: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
           })
         }
       }
-      // if (body.find('#ember167 > :nth-child(3) > :nth-child(1)').length > 0) {
-      //   cy.get('#ember167 > :nth-child(3) > :nth-child(1)').then((text) => {
-      //     const organizations = text[0].innerText.trim()
-      //     console.log("Organizações: ", organizations)
-      //   })
-      // }
     })
-
-
   })
-    // console.log("sites: ")
-    // cy.get(':nth-child(1) > .pv-contact-info__contact-link').invoke('text').then((text) => {
-    //   const linkedinProfile = text.trim();
-    //   console.log("perfil: ", linkedinProfile) 
-    // })
-
-    // cy.get('.ci-vanity-url > .pv-contact-info__ci-container > .pv-contact-info__contact-link').invoke('text').then((text) => {
-    //   const linkedinProfile = text.trim();
-    //   console.log("perfil: ", linkedinProfile) 
-    // })
-
-    // cy.get('.ci-vanity-url > .pv-contact-info__ci-container > .pv-contact-info__contact-link').invoke('text').then((text) => {
-    //   const linkedinProfile = text.trim();
-    //   console.log("perfil: ", linkedinProfile) 
-    // })
-
 })
 
+function removeDuplicates(texto) {
+  const textNoDuplications = texto
+      .split('\n')
+      .filter((linha, index, array) => array.indexOf(linha) === index)
+      .join('\n');
 
-
-// describe('Experiências do LinkedIn', () => {
-//   it('Deve obter as experiências do perfil do LinkedIn', () => {
-//     // Visite a página de login do LinkedIn
-//     cy.visit('https://www.linkedin.com/login');
-//
-//     // Preencha os campos de e-mail e senha e faça login
-//     cy.get('#username').type('lticontasc@gmail.com');
-//     cy.get('#password').type('Linkedinlti!');
-//     cy.get('.btn__primary--large').click();
-//
-//     // Aguarde até que a página de feed seja carregada
-//     cy.waitUntil(() => cy.url().should('include', '/feed'), { timeout: 10000 });
-//
-//     // Vá para o perfil do usuário
-//     cy.visit(profileUrl);
-//
-//     // Aguarde até que a página do perfil seja carregada
-//     cy.waitUntil(() => cy.url().should('include', '/in/'), { timeout: 10000 });
-//
-//     // Role até o final da página para carregar todas as experiências
-//     cy.scrollTo('bottom');
-//
-//     // Obtenha todas as seções de experiência do perfil
-//     cy.get('.experience-section').should('have.length.gt', 0).then((sections) => {
-//       // Itere sobre cada seção de experiência
-//       sections.each((index, section) => {
-//         // Obtenha o título da experiência
-//         const title = Cypress.$(section).find('.experience-section__title').text();
-//
-//         // Obtenha as datas de início e fim da experiência
-//         const dates = Cypress.$(section).find('.date-range__duration').text();
-//
-//         // Obtenha a descrição da experiência
-//         const description = Cypress.$(section).find('.experience-section__description').text();
-//
-//         // Imprima as informações da experiência no console
-//         cy.log(`Experiência ${index + 1}`);
-//         cy.log(`Título: ${title}`);
-//         cy.log(`Datas: ${dates}`);
-//         cy.log(`Descrição: ${description}`);
-//       });
-//     });
-//   });
-// });
-
-
+  return textNoDuplications
+}
