@@ -1,40 +1,87 @@
 const { timeout } = require("async")
+const { after } = require("cypress/types/lodash")
 const { elementAt } = require("rxjs")
 
 const profiles = ['https://www.linkedin.com/in/micheleprofmatematica/', 'https://www.linkedin.com/in/dhiogo-bandeira-nobrega-660951192/', 'https://www.linkedin.com/in/conrado-sanchez-alonso']
 // https://www.linkedin.com/in/micheleprofmatematica/
 // https://www.linkedin.com/in/dhiogo-bandeira-nobrega-660951192/
-const profileUrl = profiles[2]
-const loginPage = 'https://www.linkedin.com/authwall?trk=qf&original_referer=https://www.linkedin.com/in/micheleprofmatematica/?originalSubdomain=br&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2F'
+var profileUrl = profiles[1]
+var loginPage = 'https://www.linkedin.com/authwall?trk=qf&original_referer=https://www.linkedin.com/in/micheleprofmatematica/?originalSubdomain=br&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2F'
+var title = ''
+var subscription = ''
+var talkAbout = ''
+var city = ''
+var follows = ''
+var about = ''
+var languages = []
+var contactInfo = ''
+var sites = []
+var education = []
+var experience = ''
+var skills = []
+var volunteering = []
+var licencesAndCertifications = []
+var projects = []
+var publications = []
+var courses = []
+var honorsAndAwards = []
+var organizations = []
+
 
 describe('template spec', () => {
   before(() => {
     cy.visit(loginPage, {
       failOnStatusCode: false
-      })
-      cy.get('.authwall-join-form__form-toggle--bottom').click()
-      cy.wait(2000)
-      cy.get('#session_key').type('lticontasc@gmail.com')
-      cy.get('#session_password').type('Linkedinlti!')
-      cy.get('.justify-between > .btn-md').click()
-      cy.wait(20000)
-      cy.visit(profileUrl)
+    })
+    cy.get('.authwall-join-form__form-toggle--bottom').click()
+    cy.wait(2000)
+    cy.get('#session_key').type('lticontasc@gmail.com')
+    cy.get('#session_password').type('Linkedinlti!')
+    cy.get('.justify-between > .btn-md').click()
+    cy.wait(20000)
+    cy.visit(profileUrl)
+  })
+  after(() => {
+    const usuarioJson = 
+    {
+      "title":title,
+      "subscription":subscription,
+      "talkAbout":talkAbout,
+      "city":city,
+      "follows":follows,
+      "about":about,
+      "languages":languages,
+      "contactInfo":contactInfo,
+      "sites":sites,
+      "education":education,
+      "experience":experience,
+      "skills":skills,
+      "volunteering":volunteering,
+      "licencesAndCertifications":licencesAndCertifications,
+      "projects":projects,
+      "publications":publications,
+      "courses":courses,
+      "honorsAndAwards":honorsAndAwards,
+      "organizations":organizations
+    }
+    console.log(usuarioJson)
   })
   it('passes', () => {
     cy.wait(2000)
     cy.get('.text-heading-xlarge').invoke('text').then((text) => {
-      const title = text.trim();
+      console.log(text)
+      title = text.trim();
       console.log("titulo: ",title)
     })
     cy.get('.text-body-medium').invoke('text').then((text) => {
-      const subscription = text.trim();
+      subscription = text.trim();
       console.log("descrição: ", subscription)
     })
 
     cy.get('body').then((body) => {
       if (body.find('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').length > 0) {
         cy.get('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').invoke('text').then((text) => {
-          const talkAbout = text.trim();
+          talkAbout = text.trim();
           console.log("fala sobre: ", talkAbout)
         })
       }
@@ -44,7 +91,7 @@ describe('template spec', () => {
     cy.get('body').then((body) => {
       if (body.find('.pv-text-details__left-panel.mt2 > .text-body-small').length > 0) {
         cy.get('.pv-text-details__left-panel.mt2 > .text-body-small').invoke('text').then((text) => {
-          const city = text.trim();
+          city = text.trim();
           console.log("cidade: ", city)
         })
       }
@@ -55,7 +102,7 @@ describe('template spec', () => {
     cy.get('body').then((body) => {
       if (body.find('.pv-top-card--list').length > 0) {
         cy.get('.pv-top-card--list').invoke('text').then((text) => {
-          const follows = text.trim().replace(/\s/g, " ");
+          follows = text.trim().replace(/\s/g, " ");
           console.log("Seguidores: ", follows)
         })
       }
@@ -75,7 +122,7 @@ describe('template spec', () => {
     cy.get('body').then((body) => {
       if (body.find('.pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]').length > 0) {
         cy.get('.pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]').then((text) => {
-          const about = text[0].innerText;
+          about = text[0].innerText;
           console.log("Sobre: ", about)
         })
       }
@@ -98,6 +145,7 @@ describe('template spec', () => {
           if (body.find(`#${id}`)) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                languages.push(value[0].innerText.trim())
                 console.log("languages: ", value[0].innerText.trim())
               })
             }
@@ -126,12 +174,11 @@ describe('template spec', () => {
     //   console.log("perfil: ", linkedinProfile) 
     // })
     // const cont = 0;
-    const array = []
 
     cy.get('body').then((body) => {
       if (body.find('.ci-vanity-url > .pv-contact-info__ci-container').length > 0) {
         cy.get('.ci-vanity-url > .pv-contact-info__ci-container').then((text) =>{
-          const contactInfo = text[0].innerText
+          contactInfo = text[0].innerText
           console.log("Informação de contato: ", contactInfo)
         })
 
@@ -140,13 +187,14 @@ describe('template spec', () => {
 
     cy.get('body').then((body) => {
       if (body.find('.ci-websites > .list-style-none').length > 0) {
-        cy.get('.ci-websites > .list-style-none').each((sites) => {
-          if(sites[0].children[0].innerText) {
-            array.push(sites[0].children[0].innerText)
+        cy.get('.ci-websites > .list-style-none').each((site) => {
+          if(site[0].children[0].innerText) {
+            site.push(site[0].children[0].innerText)
           }
-        }).then((array) => {
-          array.each((element) => {
-            console.log("site: ", array[element].innerText)
+        }).then((site) => {
+          site.each((element) => {
+            sites.push(site[element].innerText)
+            console.log("site: ", site[element].innerText)
           })
         });
       }
@@ -163,6 +211,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  education.push(value[0].innerText.trim())
                   console.log("education: ", value[0].innerText.trim())
                 })
               }
@@ -228,6 +277,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  experience.push(value[0].innerText.trim())
                   console.log("Experience: ", value[0].innerText.trim())
                 })
               }
@@ -247,8 +297,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  skills.push(value[0].innerText.trim())
                   console.log("skills: ", value[0].innerText.trim())
-
                 })
               }
             }
@@ -272,8 +322,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  volunteering.push(value[0].innerText.trim())
                   console.log("Volunteering experience: ", value[0].innerText.trim())
-
                 })
               }
             }
@@ -292,8 +342,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  licencesAndCertifications.push(value[0].innerText.trim())
                   console.log("licenses and certifications: ", value[0].innerText.trim())
-
                 })
               }
             }
@@ -317,8 +367,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  projects.push(value[0].innerText.trim())
                   console.log("projects: ", value[0].innerText.trim())
-
                 })
               }
             }
@@ -336,8 +386,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  publications.push(value[0].innerText.trim())
                   console.log("publications: ", value[0].innerText.trim())
-
                 })
               }
             }
@@ -361,8 +411,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  courses.push(value[0].innerText.trim())
                   console.log("courses: ", value[0].innerText.trim())
-
                 })
               }
             }
@@ -386,8 +436,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  honorsAndAwards.push(value[0].innerText.trim())
                   console.log("honors and awards: ", value[0].innerText.trim())
-
                 })
               }
             }
@@ -411,8 +461,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
+                  organizations.push(value[0].innerText.trim())
                   console.log("organizations: ", value[0].innerText.trim())
-
                 })
               }
             }
