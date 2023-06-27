@@ -28,16 +28,21 @@ var organizations = []
 
 describe('template spec', () => {
   before(() => {
+    cy.fixture('../cookies.json').then(cookies => {
+      // Configura cada cookie lido
+      cookies.forEach(cookie => {
+        cy.setCookie(cookie.name, cookie.value, {
+          domain: cookie.domain,
+          path: cookie.path,
+          secure: cookie.secure,
+          httpOnly: cookie.httpOnly,
+          expiry: cookie.expiry
+        });
+      });
+    });
     cy.visit(loginPage, {
       failOnStatusCode: false
     })
-    cy.get('.authwall-join-form__form-toggle--bottom').click()
-    cy.wait(2000)
-    cy.get('#session_key').type('lticontasc@gmail.com')
-    cy.get('#session_password').type('Linkedinlti!')
-    cy.get('.justify-between > .btn-md').click()
-    cy.wait(20000)
-    cy.visit(profileUrl)
   })
   after(() => {
     const usuarioJson = 
@@ -65,6 +70,7 @@ describe('template spec', () => {
     console.log(usuarioJson)
   })
   it('passes', () => {
+    cy.visit(profileUrl)
     cy.wait(2000)
     cy.get('.text-heading-xlarge').invoke('text').then((text) => {
       title = text.trim();
