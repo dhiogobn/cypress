@@ -1,11 +1,10 @@
 const { timeout } = require("async")
-const { after } = require("cypress/types/lodash")
 const { elementAt } = require("rxjs")
 
 const profiles = ['https://www.linkedin.com/in/micheleprofmatematica/', 'https://www.linkedin.com/in/dhiogo-bandeira-nobrega-660951192/', 'https://www.linkedin.com/in/conrado-sanchez-alonso']
 // https://www.linkedin.com/in/micheleprofmatematica/
 // https://www.linkedin.com/in/dhiogo-bandeira-nobrega-660951192/
-const profileUrl = profiles[1]
+const profileUrl = profiles[0]
 const loginPage = 'https://www.linkedin.com/authwall?trk=qf&original_referer=https://www.linkedin.com/in/micheleprofmatematica/?originalSubdomain=br&sessionRedirect=https%3A%2F%2Fwww.linkedin.com%2F'
 var title = ''
 var subscription = ''
@@ -17,7 +16,7 @@ var languages = []
 var contactInfo = ''
 var sites = []
 var education = []
-var experience = ''
+var experience = []
 var skills = []
 var volunteering = []
 var licencesAndCertifications = []
@@ -44,7 +43,7 @@ describe('template spec', () => {
     const usuarioJson = 
     {
       "title":title,
-      "subscription":subscription,
+      "description":subscription,
       "talkAbout":talkAbout,
       "city":city,
       "follows":follows,
@@ -68,7 +67,6 @@ describe('template spec', () => {
   it('passes', () => {
     cy.wait(2000)
     cy.get('.text-heading-xlarge').invoke('text').then((text) => {
-      console.log(text)
       title = text.trim();
       console.log("titulo: ",title)
     })
