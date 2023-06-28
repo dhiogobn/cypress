@@ -68,6 +68,20 @@ describe('template spec', () => {
       "organizations":organizations
     }
     console.log(usuarioJson)
+    const jsonContent = JSON.stringify(usuarioJson);
+    const blob = new Blob([jsonContent], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "userJson.json");
+    document.body.appendChild(link);
+
+    link.click();
+
+    // Cleanup
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
   })
   it('passes', () => {
     cy.visit(profileUrl)
