@@ -1,7 +1,9 @@
 const { timeout } = require("async")
 const { elementAt } = require("rxjs")
+const XLSX = require('xlsx')
 
 const profileUrl = Cypress.env('url')
+
 const loginPage = profileUrl
 var title = ''
 var subscription = ''
@@ -42,7 +44,7 @@ describe('template spec', () => {
     })
   })
   after(() => {
-    const usuarioJson = 
+    const userJson =
     {
       "title":title,
       "description":subscription,
@@ -64,8 +66,15 @@ describe('template spec', () => {
       "honorsAndAwards":honorsAndAwards,
       "organizations":organizations
     }
-    console.log(usuarioJson)
-    const jsonContent = JSON.stringify(usuarioJson);
+    console.log(userJson)
+    document.addEventListener("DOMContentLoaded", function() {
+      console.log('entrou no domContentLoaded')
+      // Exibir JSON no elemento <pre>
+      document.getElementById('json-container').textContent = JSON.stringify(userJson, null, 2);
+    })
+    generateExcelFile(userJson)
+    const jsonContent = JSON.stringify(userJson);
+    console.log("jsonContent: ", jsonContent)
     const blob = new Blob([jsonContent], { type: "application/json" });
     const url = URL.createObjectURL(blob);
 
@@ -79,18 +88,19 @@ describe('template spec', () => {
     // Cleanup
     URL.revokeObjectURL(url);
     document.body.removeChild(link);
+
   })
   it('passes', () => {
     cy.visit(profileUrl)
     cy.wait(2000)
     cy.get('.text-heading-xlarge').invoke('text').then((text) => {
       title = text.trim();
-      console.log("titulo: ",title)
+      cy.log("titulo: ",title)
     })
     cy.wait(2000)
     cy.get('.text-body-medium').invoke('text').then((text) => {
       subscription = text.trim();
-      console.log("descrição: ", subscription)
+      cy.log("descrição: ", subscription)
     })
 
     cy.wait(2000)
@@ -98,7 +108,7 @@ describe('template spec', () => {
       if (body.find('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').length > 0) {
         cy.get('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').invoke('text').then((text) => {
           talkAbout = text.trim();
-          console.log("fala sobre: ", talkAbout)
+          cy.log("fala sobre: ", talkAbout)
         })
       }
     })
@@ -108,7 +118,7 @@ describe('template spec', () => {
       if (body.find('.pv-text-details__left-panel.mt2 > .text-body-small').length > 0) {
         cy.get('.pv-text-details__left-panel.mt2 > .text-body-small').invoke('text').then((text) => {
           city = text.trim();
-          console.log("cidade: ", city)
+          cy.log("cidade: ", city)
         })
       }
     })
@@ -119,7 +129,7 @@ describe('template spec', () => {
       if (body.find('.pv-top-card--list').length > 0) {
         cy.get('.pv-top-card--list').invoke('text').then((text) => {
           follows = text.trim().replace(/\s/g, " ");
-          console.log("Seguidores: ", follows)
+          cy.log("Seguidores: ", follows)
         })
       }
     })
@@ -139,7 +149,7 @@ describe('template spec', () => {
       if (body.find('.pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]').length > 0) {
         cy.get('.pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]').then((text) => {
           about = text[0].innerText;
-          console.log("Sobre: ", about)
+          cy.log("Sobre: ", about)
         })
       }
     })
@@ -161,8 +171,8 @@ describe('template spec', () => {
           if (body.find(`#${id}`)) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                languages.push(value[0].innerText.trim())
-                console.log("languages: ", removeDuplicates(value[0].innerText.trim()))
+                languages.push(removeDuplicates(value[0].innerText.trim()))
+                cy.log("languages: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
           }
@@ -182,11 +192,11 @@ describe('template spec', () => {
         cy.wait(2000)
       }
     })
-    console.log("informações de contato")
+    cy.log("informações de contato")
 
     // cy.get('.ci-vanity-url > .pv-contact-info__ci-container > .pv-contact-info__contact-link').invoke('text').then((text) => {
     //   const linkedinProfile = text.trim();
-    //   console.log("perfil: ", linkedinProfile) 
+    //   console.log("perfil: ", linkedinProfile)
     // })
     // const cont = 0;
     cy.wait(2000)
@@ -194,7 +204,7 @@ describe('template spec', () => {
       if (body.find('.ci-vanity-url > .pv-contact-info__ci-container').length > 0) {
         cy.get('.ci-vanity-url > .pv-contact-info__ci-container').then((text) =>{
           contactInfo = text[0].innerText
-          console.log("Informação de contato: ", contactInfo)
+          cy.log("Informação de contato: ", contactInfo)
         })
 
       }
@@ -210,7 +220,7 @@ describe('template spec', () => {
         }).then((site) => {
           site.each((element) => {
             sites.push(site[element].innerText)
-            console.log("site: ", site[element].innerText)
+            cy.log("site: ", site[element].innerText)
           })
         });
       }
@@ -227,8 +237,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  education.push(value[0].innerText.trim())
-                  console.log("education: ", removeDuplicates(value[0].innerText.trim()))
+                  education.push(removeDuplicates(value[0].innerText.trim()))
+                  cy.log("education: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
@@ -248,8 +258,8 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  experience.push(value[0].innerText.trim())
-                  console.log("Experience: ", removeDuplicates(value[0].innerText.trim()))
+                  experience.push(removeDuplicates(value[0].innerText.trim()))
+                  cy.log("Experience: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
             }
@@ -267,7 +277,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  skills.push(value[0].innerText.trim())
+                  skills.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("skills: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -286,7 +296,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  volunteering.push(value[0].innerText.trim())
+                  volunteering.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("Volunteering experience: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -306,7 +316,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  licencesAndCertifications.push(value[0].innerText.trim())
+                  licencesAndCertifications.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("licenses and certifications: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -325,7 +335,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  projects.push(value[0].innerText.trim())
+                  projects.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("projects: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -344,7 +354,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  publications.push(value[0].innerText.trim())
+                  publications.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("publications: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -363,7 +373,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  courses.push(value[0].innerText.trim())
+                  courses.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("courses: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -382,7 +392,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  honorsAndAwards.push(value[0].innerText.trim())
+                  honorsAndAwards.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("honors and awards: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -401,7 +411,7 @@ describe('template spec', () => {
             if (body.find(`#${id}`)) {
               if (cy.get(`#${id}`)) {
                 cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
-                  organizations.push(value[0].innerText.trim())
+                  organizations.push(removeDuplicates(value[0].innerText.trim()))
                   console.log("organizations: ", removeDuplicates(value[0].innerText.trim()))
                 })
               }
@@ -421,3 +431,38 @@ function removeDuplicates(texto) {
 
   return textNoDuplications
 }
+
+function generateExcelFile(userJson) {
+  const workbook = XLSX.utils.book_new(); // Cria um novo workbook
+
+  // Converte os arrays em objetos com chaves numéricas para que possam ser exibidos corretamente no Excel
+  const userJsonArraysFixed = {};
+  for (const key in userJson) {
+    if (Array.isArray(userJson[key])) {
+      for (let i = 0; i < userJson[key].length; i++) {
+        const arrayKey = `${key}_${i}`;
+        userJsonArraysFixed[arrayKey] = userJson[key][i];
+      }
+    } else {
+      userJsonArraysFixed[key] = userJson[key];
+    }
+  }
+
+  // Cria uma planilha no workbook
+  const worksheet = XLSX.utils.json_to_sheet([userJsonArraysFixed]);
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Dados do Usuário'); // Adiciona a planilha ao workbook
+
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' }); // Converte o workbook para um buffer
+
+  const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = URL.createObjectURL(data);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'userJson.xlsx'; // Nome do arquivo Excel
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
+
