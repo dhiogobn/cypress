@@ -6,7 +6,6 @@ const excel = require('exceljs');
 const profileUrl = Cypress.env('url')
 
 
-var hasSpreadSheetAlready = false;
 const loginPage = profileUrl
 var title = ''
 var subscription = ''
@@ -28,8 +27,75 @@ var courses = []
 var honorsAndAwards = []
 var organizations = []
 
+var userJsonAux =
+    {
+      "title":'',
+      "description":'',
+      "talkAbout":'',
+      "city":'',
+      "follows":'',
+      "about":'',
+      "languages":[],
+      "contactInfo":'',
+      "sites":[],
+      "education":[],
+      "experience":[],
+      "skills":[],
+      "volunteering":[],
+      "licencesAndCertifications":[],
+      "projects":[],
+      "publications":[],
+      "courses":[],
+      "honorsAndAwards":[],
+      "organizations":[]
+    }
+
+    function cleanJson() {
+      userJsonAux =
+          {
+            "title":'',
+            "description":'',
+            "talkAbout":'',
+            "city":'',
+            "follows":'',
+            "about":'',
+            "languages":[],
+            "contactInfo":'',
+            "sites":[],
+            "education":[],
+            "experience":[],
+            "skills":[],
+            "volunteering":[],
+            "licencesAndCertifications":[],
+            "projects":[],
+            "publications":[],
+            "courses":[],
+            "honorsAndAwards":[],
+            "organizations":[]
+          }
+      title = ''
+       subscription = ''
+       talkAbout = ''
+       city = ''
+       follows = ''
+       about = ''
+       languages = []
+       contactInfo = ''
+       sites = []
+       education = []
+       experience = []
+       skills = []
+       volunteering = []
+       licencesAndCertifications = []
+       projects = []
+       publications = []
+       courses = []
+       honorsAndAwards = []
+       organizations = []
+    }
+
 describe('template spec', () => {
-  before(() => {
+  beforeEach(() => {
     cy.fixture('../cookies.json').then(cookies => {
       // Configura cada cookie lido
       cookies.forEach(cookie => {
@@ -46,7 +112,8 @@ describe('template spec', () => {
       failOnStatusCode: false
     })
   })
-  after(() => {
+  afterEach(() => {
+    generateExcelFile(userJsonAux)
     const userJson =
     {
       "title":title,
@@ -69,16 +136,9 @@ describe('template spec', () => {
       "honorsAndAwards":honorsAndAwards,
       "organizations":organizations
     }
+    console.log("este é o userjson aux", userJsonAux)
     console.log(userJson)
-    document.addEventListener("DOMContentLoaded", function() {
-      console.log('entrou no domContentLoaded')
-      // Exibir JSON no elemento <pre>
-      document.getElementById('json-container').textContent = JSON.stringify(userJson, null, 2);
-    })
     // Chame a função para gerar o arquivo Excel com o objeto JSON inicial e adicionar outros objetos JSON à mesma planilha
-
-    generateExcelFile(userJson)
-
     // generateExcelFile(userJson)
     const jsonContent = JSON.stringify(userJson);
     console.log("jsonContent: ", jsonContent)
@@ -95,30 +155,48 @@ describe('template spec', () => {
     // Cleanup
     URL.revokeObjectURL(url);
     document.body.removeChild(link);
+    cleanJson()
+  })
+  const arrayProfileUrl = profileUrl.split(';');
 
-  })
-  it('passes', () => {
-    const arrayProfileUrl = profileUrl.split(';')
-    if (arrayProfileUrl.length > 1) {
-      for (let index = 0; index < arrayProfileUrl.length; index++) {
-        getLinkedinDatas(arrayProfileUrl[index])
-      }
-    }else {
-      getLinkedinDatas(profileUrl)
-    }
-  })
+  if (arrayProfileUrl.length > 1) {
+    arrayProfileUrl.forEach((url) => {
+      it(`handles ${url}`, () => {
+        getLinkedinDatas(url);
+      });
+    });
+  } else {
+    it('handles single URL', () => {
+      getLinkedinDatas(profileUrl);
+    });
+  }
+  // it('passes', () => {
+  //   const arrayProfileUrl = profileUrl.split(';');
+  //
+  //   if (arrayProfileUrl.length > 1) {
+  //     arrayProfileUrl.forEach((url) => {
+  //         getLinkedinDatas(url);
+  //     })
+  //   } else {
+  //       getLinkedinDatas(profileUrl);
+  //   }
+  // });
+
 })
 function getLinkedinDatas(profileUrl) {
+  console.log(profileUrl)
   cy.visit(profileUrl)
   cy.wait(2000)
   cy.get('.text-heading-xlarge').invoke('text').then((text) => {
     title = text.trim();
-    cy.log("titulo: ",title)
+    userJsonAux.title = title
+    console.log("titulo: ",title)
   })
   cy.wait(2000)
   cy.get('.text-body-medium').invoke('text').then((text) => {
     subscription = text.trim();
-    cy.log("descrição: ", subscription)
+    userJsonAux.description = subscription
+    console.log("descrição: ", subscription)
   })
 
   cy.wait(2000)
@@ -126,7 +204,8 @@ function getLinkedinDatas(profileUrl) {
     if (body.find('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').length > 0) {
       cy.get('.relative > :nth-child(1) > .text-body-small > [aria-hidden="true"]').invoke('text').then((text) => {
         talkAbout = text.trim();
-        cy.log("fala sobre: ", talkAbout)
+        userJsonAux.talkAbout = talkAbout
+        console.log("fala sobre: ", talkAbout)
       })
     }
   })
@@ -136,7 +215,8 @@ function getLinkedinDatas(profileUrl) {
     if (body.find('.pv-text-details__left-panel.mt2 > .text-body-small').length > 0) {
       cy.get('.pv-text-details__left-panel.mt2 > .text-body-small').invoke('text').then((text) => {
         city = text.trim();
-        cy.log("cidade: ", city)
+        userJsonAux.city = city
+        console.log("cidade: ", city)
       })
     }
   })
@@ -147,7 +227,8 @@ function getLinkedinDatas(profileUrl) {
     if (body.find('.pv-top-card--list').length > 0) {
       cy.get('.pv-top-card--list').invoke('text').then((text) => {
         follows = text.trim().replace(/\s/g, " ");
-        cy.log("Seguidores: ", follows)
+        userJsonAux.follows = follows
+        console.log("Seguidores: ", follows)
       })
     }
   })
@@ -167,7 +248,8 @@ function getLinkedinDatas(profileUrl) {
     if (body.find('.pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]').length > 0) {
       cy.get('.pv-shared-text-with-see-more > .inline-show-more-text > [aria-hidden="true"]').then((text) => {
         about = text[0].innerText;
-        cy.log("Sobre: ", about)
+        userJsonAux.about = about
+        console.log("Sobre: ", about)
       })
     }
   })
@@ -190,7 +272,8 @@ function getLinkedinDatas(profileUrl) {
           if (cy.get(`#${id}`)) {
             cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
               languages.push(removeDuplicates(value[0].innerText.trim()))
-              cy.log("languages: ", removeDuplicates(value[0].innerText.trim()))
+              userJsonAux.languages = languages
+              console.log("languages: ", removeDuplicates(value[0].innerText.trim()))
             })
           }
         }
@@ -222,7 +305,8 @@ function getLinkedinDatas(profileUrl) {
     if (body.find('.ci-vanity-url > .pv-contact-info__ci-container').length > 0) {
       cy.get('.ci-vanity-url > .pv-contact-info__ci-container').then((text) =>{
         contactInfo = text[0].innerText
-        cy.log("Informação de contato: ", contactInfo)
+        userJsonAux.contactInfo = contactInfo
+        console.log("Informação de contato: ", contactInfo)
       })
 
     }
@@ -238,7 +322,8 @@ function getLinkedinDatas(profileUrl) {
       }).then((site) => {
         site.each((element) => {
           sites.push(site[element].innerText)
-          cy.log("site: ", site[element].innerText)
+          userJsonAux.sites = sites
+          console.log("site: ", site[element].innerText)
         })
       });
     }
@@ -256,7 +341,8 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 education.push(removeDuplicates(value[0].innerText.trim()))
-                cy.log("education: ", removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.education = education
+                console.log("education: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
           }
@@ -277,7 +363,8 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 experience.push(removeDuplicates(value[0].innerText.trim()))
-                cy.log("Experience: ", removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.experience = experience
+                console.log("Experience: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
           }
@@ -296,6 +383,7 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 skills.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.skills = skills
                 console.log("skills: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
@@ -315,6 +403,7 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 volunteering.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.volunteering = volunteering
                 console.log("Volunteering experience: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
@@ -335,6 +424,7 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 licencesAndCertifications.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.licencesAndCertifications = licencesAndCertifications
                 console.log("licenses and certifications: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
@@ -354,6 +444,7 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 projects.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.projects = projects
                 console.log("projects: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
@@ -373,6 +464,7 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 publications.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.publications = publications
                 console.log("publications: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
@@ -392,6 +484,7 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 courses.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.courses = courses
                 console.log("courses: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
@@ -411,6 +504,7 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 honorsAndAwards.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.honorsAndAwards = honorsAndAwards
                 console.log("honors and awards: ", removeDuplicates(value[0].innerText.trim()))
               })
             }
@@ -430,14 +524,17 @@ function getLinkedinDatas(profileUrl) {
             if (cy.get(`#${id}`)) {
               cy.get(`#${id} > :nth-child(3) > :nth-child(1)`).then((value) => {
                 organizations.push(removeDuplicates(value[0].innerText.trim()))
+                userJsonAux.organizations = organizations
                 console.log("organizations: ", removeDuplicates(value[0].innerText.trim()))
               })
+
             }
           }
         })
       }
     }
   })
+
 }
 
 
@@ -451,10 +548,12 @@ function removeDuplicates(texto) {
 }
 
 function generateExcelFile(userJson) {
+  const timeStemp = Date.now();
+  console.log("nome: ", userJson.title)
   const workbook = XLSX.utils.book_new(); // Cria um novo workbook
 
   // Converte os arrays em objetos com chaves numéricas para que possam ser exibidos corretamente no Excel
-  const userJsonArraysFixed = {};
+  var userJsonArraysFixed = {};
   for (const key in userJson) {
     if (Array.isArray(userJson[key])) {
       for (let i = 0; i < userJson[key].length; i++) {
@@ -466,6 +565,8 @@ function generateExcelFile(userJson) {
     }
   }
 
+  console.log("userJsonArraysFixed", userJsonArraysFixed)
+
   // Cria uma planilha no workbook
   const worksheet = XLSX.utils.json_to_sheet([userJsonArraysFixed]);
 
@@ -475,10 +576,11 @@ function generateExcelFile(userJson) {
 
   const data = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const url = URL.createObjectURL(data);
+  console.log("url", url)
 
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'userJson.xlsx'; // Nome do arquivo Excel
+  link.download = `linkedin${userJson.title}${timeStemp}.xlsx`; // Nome do arquivo Excel
   link.click();
 
   URL.revokeObjectURL(url);
